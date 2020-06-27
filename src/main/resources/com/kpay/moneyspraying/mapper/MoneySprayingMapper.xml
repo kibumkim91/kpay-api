@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kpay.moneyspraying.mapper.MoneySprayingMapper">
+
+	<!-- Dynamic Where Condition -->
+	<sql id="dynamicWhere">
+		<where>
+			<if test="sprayingId != null and sprayingId != ''">
+				AND SPRAYING_ID = #{sprayingId}
+			</if>
+			<if test="roomId != null and roomId != ''">
+				AND ROOM_ID = #{roomId}
+			</if>
+			<if test="totalAmount != null and totalAmount != ''">
+				AND TOTAL_AMOUNT = #{totalAmount}
+			</if>
+			<if test="totalCount &gt; 0">
+				AND TOTAL_COUNT = #{totalCount}
+			</if>
+			<if test="token != null and token != ''">
+				AND TOKEN = #{token}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND USER_ID = #{userId}
+			</if>
+			<if test="retrieveInterval != '' and retrieveUnit != ''">
+				AND CREATE_AT >= NOW() - INTERVAL ${retrieveInterval} ${retrieveUnit}
+			</if>
+		</where>
+	</sql>
+
+	<!-- Insert MONEY_SPRAYING -->
+	<insert id="insertMoneySpraying" parameterType="MoneySpraying" useGeneratedKeys="true" keyProperty="sprayingId">
+		INSERT INTO MONEY_SPRAYING ( 
+			ROOM_ID
+			,TOTAL_AMOUNT
+			,TOTAL_COUNT
+			,TOKEN
+			,USER_ID
+		) VALUES (
+			#{roomId} 
+			,#{totalAmount} 
+			,#{totalCount} 
+			,#{token} 
+			,#{userId} 
+		)
+	</insert>
+	
+	<!-- Select MONEY_SPRAYING List -->
+	<select id="selectToken" resultType="string">
+		SELECT SUBSTRING(UUID(), 0, 3)
+	</select>
+
+	<!-- Select MONEY_SPRAYING List -->
+	<select id="selectMoneySprayingList" parameterType="MoneySpraying" resultType="MoneySpraying">
+		SELECT 
+			SPRAYING_ID	AS sprayingId
+			,ROOM_ID	AS roomId
+			,TOTAL_COUNT	AS totalCount
+			,TOTAL_AMOUNT	AS totalAmount
+			,REMIT_AMOUNT	AS remitAmount
+			,TOKEN	AS token
+			,USER_ID	AS userId
+			,CREATE_AT	AS createAt
+		FROM MONEY_SPRAYING		
+		<include refid="dynamicWhere" />
+	</select>
+	
+	<!-- Select MONEY_SPRAYING -->
+	<select id="selectMoneySpraying" parameterType="MoneySpraying" resultType="MoneySpraying">
+		SELECT 
+			SPRAYING_ID	AS sprayingId
+			,ROOM_ID	AS roomId
+			,TOTAL_COUNT	AS totalCount
+			,TOTAL_AMOUNT	AS totalAmount
+			,REMIT_AMOUNT	AS remitAmount
+			,TOKEN	AS token
+			,USER_ID	AS userId
+			,CREATE_AT	AS createAt
+		FROM MONEY_SPRAYING		
+		<include refid="dynamicWhere" />
+	</select>
+	
+	
+	<!-- Update MONEY_SPRAYING -->
+	<update id="updateMoneySpraying" parameterType="MoneySpraying">
+		UPDATE MONEY_SPRAYING
+		<trim prefix="SET" prefixOverrides=",">
+			<if test="roomId != null and roomId != ''">
+				, ROOM_ID = #{roomId}
+			</if>
+			<if test="totalCount &gt; 0">
+				, TOTAL_COUNT = #{totalCount}
+			</if>
+			<if test="totalAmount &gt; 0">
+				, TOTAL_AMOUNT = #{totalAmount}
+			</if>
+			<if test="remitAmount &gt; 0">
+				, REMIT_AMOUNT = #{remitAmount}
+			</if>
+			<if test="token != null and token != ''">
+				, TOKEN = #{token}
+			</if>
+			<if test="userId != null and userId != ''">
+				, USER_ID = #{userId}
+			</if>			
+		</trim>
+		WHERE
+			SPRAYING_ID = #{sprayingId}
+	</update>
+	
+	<!-- Delete MONEY_SPRAYING -->
+	<delete id="deleteMoneySpraying" parameterType="MoneySpraying">
+		DELETE FROM MONEY_SPRAYING		
+		WHERE
+			SPRAYING_ID = #{sprayingId}
+	</delete>
+</mapper>
+

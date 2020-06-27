@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kpay.common.mapper.UserMapper">
+	<resultMap id="User" type="com.kpay.common.domain.User">
+		<result property="id" column="user_id" />
+		<result property="active" column="active" />
+		<result property="loginId" column="login_id" />
+		<result property="userName" column="user_name" />
+		<result property="password" column="password" />
+	</resultMap>
+
+	<select id="findUserByLoginId" resultMap="User">
+		SELECT USER_ID, ACTIVE, LOGIN_ID, USER_NAME, PASSWORD 
+		FROM USER
+		<where>
+			<if test=" loginId != null and loginId != '' "> AND LOGIN_ID = #{loginId} </if>
+		</where>
+	</select>
+
+	<insert id="insertUserInfo" parameterType="com.kpay.common.domain.User"
+		useGeneratedKeys="true" keyProperty="param.id"> 
+		INSERT INTO user ( 
+			active,
+			login_id, 
+			user_name, 
+			password 
+		) VALUES ( 
+			#{param.active},
+			#{param.loginId}, 
+			#{param.userName}, 
+			#{param.password} 
+		)
+	</insert>
+</mapper>
+

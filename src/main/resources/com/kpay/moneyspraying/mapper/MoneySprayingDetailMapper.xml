@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kpay.moneyspraying.mapper.MoneySprayingDetailMapper">
+
+	<!-- Dynamic Where Condition -->
+	<sql id="dynamicWhere">
+		<where>
+			<if test="sprayingDtlId != null and sprayingDtlId != ''">
+				AND SPRAYING_DTL_ID = #{sprayingDtlId}
+			</if>
+			<if test="sprayingId != null and sprayingId != ''">
+				AND SPRAYING_ID = #{sprayingId}
+			</if>
+			<if test="amount != null and amount != ''">
+				AND AMOUNT = #{amount}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND USER_ID = #{userId}
+			</if>
+		</where>
+	</sql>
+	
+	<!-- Insert MONEY_SPRAYING_DETAIL -->
+	<insert id="insertMoneySprayingDetail" parameterType="MoneySprayingDetail">
+		INSERT INTO MONEY_SPRAYING_DETAIL ( 
+			SPRAYING_ID
+			,AMOUNT
+			,USER_ID
+		) VALUES (
+			#{sprayingId} 
+			,#{amount} 
+			,#{userId}  
+		)
+	</insert>
+
+	<!-- Select MONEY_SPRAYING_DETAIL List -->
+	<select id="selectMoneySprayingDetailList" parameterType="MoneySprayingDetail" resultType="MoneySprayingDetail">
+		SELECT 
+			SPRAYING_DTL_ID	AS sprayingDtlId
+			,SPRAYING_ID	AS sprayingId
+			,AMOUNT	AS amount
+			,USER_ID	AS userId
+			,CREATE_AT	AS createAt
+		FROM MONEY_SPRAYING_DETAIL		
+		<include refid="dynamicWhere" />
+	</select>
+	
+	<!-- Select MONEY_SPRAYING_DETAIL -->
+	<select id="selectMoneySprayingDetail" parameterType="MoneySprayingDetail" resultType="MoneySprayingDetail">
+		SELECT 
+			SPRAYING_DTL_ID	AS sprayingDtlId
+			,SPRAYING_ID	AS sprayingId
+			,AMOUNT	AS amount
+			,USER_ID	AS userId
+			,CREATE_AT	AS createAt
+		FROM MONEY_SPRAYING_DETAIL		
+		<include refid="dynamicWhere" />
+	</select>
+	
+	<!-- Update MONEY_SPRAYING_DETAIL -->
+	<update id="updateMoneySprayingDetail" parameterType="MoneySprayingDetail">        
+		UPDATE MONEY_SPRAYING_DETAIL
+		SET 
+			USER_ID = #{userId}
+		WHERE
+			SPRAYING_DTL_ID = (
+				SELECT 	MIN(SPRAYING_DTL_ID) 
+	        	FROM 	MONEY_SPRAYING_DETAIL 
+	        	WHERE 	SPRAYING_ID = #{sprayingId} AND USER_ID = 0
+			)
+			
+		<selectKey keyProperty="amount" resultType="BigDecimal" order="AFTER">
+        	SELECT 	AMOUNT	AS amount
+        	FROM 	MONEY_SPRAYING_DETAIL 
+        	WHERE 	SPRAYING_ID = #{sprayingId} AND USER_ID = #{userId}
+        </selectKey>
+	</update>
+	
+	<!-- Delete MONEY_SPRAYING_DETAIL -->
+	<delete id="deleteMoneySprayingDetail" parameterType="MoneySprayingDetail">
+		DELETE FROM MONEY_SPRAYING_DETAIL		
+		WHERE
+			SPRAYING_DTL_ID = #{sprayingDtlId}
+	</delete>
+</mapper>
